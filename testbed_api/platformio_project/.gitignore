@@ -1,0 +1,6 @@
+
+# IDE folders
+.pio/
+.vscode/
+# project folder
+project/

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+
+{% block title %}Session{% endblock title %}
+
+{% block head %}
+    {{ pins_info|json_script:'pins-info' }}
+    {% load static %}
+    <script src="{% static 'plotly-2.31.1.min.js' %}" type="module" charset="utf-8"></script>
+{#    <script src="https://cdn.plot.ly/plotly-2.31.1.min.js" charset="utf-8"></script>#}
+    <script src="{% static 'session.js' %}" type="module" charset="utf-8"></script>
+    {% csrf_token %}
+{% endblock %}
+
+{% block body %}
+    <h1>Session</h1>
+    <div style="display: flex; justify-content: space-evenly;">
+        <div style="display: grid; grid-template-columns: 1fr 0fr; align-items: center">
+            {% for pin in pins_info.pins %}
+                {% if pin.mode == 'input' %}
+                    <label style="margin-right: 15px">{{ pin.name }}</label>
+                    <!-- Rounded switch -->
+                    <label class="switch">
+                        <input type="checkbox" class="input-state" port-index="{{ pin.index }}"
+                               onclick="setInput({{ pin.index }}, this.checked);">
+                        <span class="slider round"></span>
+                    </label>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div>
+            <div id="waveform-container" style="width:800px;height:300px;"></div>
+            <img src="/session/camera_feed" alt="Camera feed error" style="width:800px;height:450px;">
+            {#            {% load static %}#}
+            {#            <img src="{% static "MIK32Static.jpg" %}" alt="Static feed not available"#}
+            {#                 style="max-width: 800px;max-height: 450px;display: block; margin: 0 auto">#}
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 0fr; align-items: center">
+            {% for pin in pins_info.pins %}
+                {% if pin.mode == 'output' %}
+                    <label style="margin-right: 15px">{{ pin.name }}</label>
+                    <div class="output-state" port-index="{{ pin.index }}" value="{{ pin.state }}"></div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <textarea id="code-input" style="width: 33%; height: 200px;"></textarea>
+        <div>
+            <button style="width: fit-content; height: fit-content; padding: 5px 10px;" onclick="uploadProgram()">
+                Upload
+            </button>
+            <div id="upload-error-text"
+                 style="overflow: scroll; white-space: nowrap; max-width: 400px; max-height: 200px;">
+            </div>
+        </div>
+    </div>
+{% endblock %}
