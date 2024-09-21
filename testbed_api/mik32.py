@@ -23,7 +23,7 @@ def upload(software: bytes) -> str:
     with open(SOFTWARE_SOURCE_PATH, mode='wb') as f:
         f.write(software)
     proc = subprocess.Popen(
-        ['pio', 'run', '--target', 'upload', '--verbose'],
+        ['pio', 'run', '-e', 'mik32v2', '--target', 'upload', '--verbose'],
         # [PIO_EXECUTABLE_PATH, '--help'],
         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         # stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr,
