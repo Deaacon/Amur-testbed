@@ -9,11 +9,11 @@
 #include "led.h"
 
 
-const int T_MIN = 640;
-const int T_MAX = 1220;
+const int T_MIN = 544/2;
+const int T_MAX = 2400/2;
 const int T_PER = 20000;
 
-Timer16_HandleTypeDef htimer16_1;
+Timer16_HandleTypeDef htimer16_1;s
 
 /*
  * Данный пример демонстрирует работу с GPIO и PAD_CONFIG.
@@ -36,8 +36,6 @@ int main()
     for (volatile int i = 0; i < 1000000; i++)
         ;
 
-    HAL_GPIO_WritePin(GPIO_1, GPIO_PIN_3, GPIO_PIN_LOW);
-
     // Вывод сообщения по UART
     // xprintf("\nProgram started!\n");
 
@@ -48,19 +46,20 @@ int main()
     // Переменная для считывания сигнала
     int state;
 
-    while (1) {
+    while (1)
+    {
         // Считывание пинов по очереди
-        // t = 0;
-        // state = HAL_GPIO_ReadPin(GPIO_2, GPIO_PIN_7);
-        // t |= state;
-        // state = HAL_GPIO_ReadPin(GPIO_2, GPIO_PIN_6);
-        // t |= state << 1;
-        // state = HAL_GPIO_ReadPin(GPIO_2, GPIO_PIN_5);
-        // t |= state << 2;
-        // state = HAL_GPIO_ReadPin(GPIO_2, GPIO_PIN_4);
-        // t |= state << 3;
-        // state = HAL_GPIO_ReadPin(GPIO_2, GPIO_PIN_3);
-        // t |= state << 4;
+        t = 0;
+        state = HAL_GPIO_ReadPin(GPIO_2, GPIO_PIN_3);
+        t |= state;
+        state = HAL_GPIO_ReadPin(GPIO_2, GPIO_PIN_4);
+        t |= state << 1;
+        state = HAL_GPIO_ReadPin(GPIO_2, GPIO_PIN_5);
+        t |= state << 2;
+        state = HAL_GPIO_ReadPin(GPIO_2, GPIO_PIN_0);
+        t |= state << 3;
+        state = HAL_GPIO_ReadPin(GPIO_2, GPIO_PIN_2);
+        t |= state << 4;
 
         // ШИМ
         int val = (1 - n % 4) * (T_MAX - T_MIN) / 1 + T_MIN;
@@ -154,9 +153,7 @@ void GPIO_Init() // Функция инициализации GPIO
     GPIO_InitStruct.Mode = HAL_GPIO_MODE_GPIO_INPUT;
     GPIO_InitStruct.Pull = HAL_GPIO_PULL_NONE;
     GPIO_InitStruct.Pin  = GPIO_PIN_0  | GPIO_PIN_1  | GPIO_PIN_2  | GPIO_PIN_3  |
-                           GPIO_PIN_4  | GPIO_PIN_5  | GPIO_PIN_6  | GPIO_PIN_7  |
-                           GPIO_PIN_8  | GPIO_PIN_9  | GPIO_PIN_10 | GPIO_PIN_11 |
-                           GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
+                           GPIO_PIN_4  | GPIO_PIN_5  | GPIO_PIN_6  | GPIO_PIN_7;
     HAL_GPIO_Init(GPIO_2, &GPIO_InitStruct);
 }
 

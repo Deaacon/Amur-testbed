@@ -215,22 +215,22 @@ void pickNumber(int x) {
 void showNumber(int n)
 {
     clearLEDs();
-    pickDigit(0); //включаем первую цифру
-    pickNumber(n%10); //значение тысячи
+    pickDigit(3); //включаем первую цифру
+    pickNumber(n/1000%10); //значение тысячи
     delay(); //пауза 5мс
 
     clearLEDs();
-    pickDigit(1); //включаем вторую цифру
-    pickNumber(n%10); //значение сотни
+    pickDigit(2); //включаем вторую цифру
+    pickNumber(n/100%10); //значение сотни
     delay(); //пауза 5мс
 
     clearLEDs();
-    pickDigit(2); //включаем третью цифру
-    pickNumber(n%10); //значение десятки
+    pickDigit(1); //включаем третью цифру
+    pickNumber(n/10%10); //значение десятки
     delay(); //пауза 5мс
 
     clearLEDs();
-    pickDigit(3); //включаем четвертую цифру
+    pickDigit(0); //включаем четвертую цифру
     pickNumber(n%10); //значение единицы
     delay(); //пауза 5мс
 }
