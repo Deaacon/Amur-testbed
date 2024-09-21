@@ -7,52 +7,83 @@
     {{ pins_info|json_script:'pins-info' }}
     {% load static %}
     <script src="{% static 'plotly-2.31.1.min.js' %}" type="module" charset="utf-8"></script>
-{#    <script src="https://cdn.plot.ly/plotly-2.31.1.min.js" charset="utf-8"></script>#}
+    {#    <script src="https://cdn.plot.ly/plotly-2.31.1.min.js" charset="utf-8"></script>#}
     <script src="{% static 'session.js' %}" type="module" charset="utf-8"></script>
     {% csrf_token %}
 {% endblock %}
 
 {% block body %}
-    <h1>Session</h1>
-    <div style="display: flex; justify-content: space-evenly;">
-        <div style="display: grid; grid-template-columns: 1fr 0fr; align-items: center">
-            {% for pin in pins_info.pins %}
-                {% if pin.mode == 'input' %}
-                    <label style="margin-right: 15px">{{ pin.name }}</label>
-                    <!-- Rounded switch -->
-                    <label class="switch">
-                        <input type="checkbox" class="input-state" port-index="{{ pin.index }}"
-                               onclick="setInput({{ pin.index }}, this.checked);">
-                        <span class="slider round"></span>
-                    </label>
-                {% endif %}
-            {% endfor %}
-        </div>
-        <div>
-            <div id="waveform-container" style="width:800px;height:300px;"></div>
-            <img src="/session/camera_feed" alt="Camera feed error" style="width:800px;height:450px;">
-            {#            {% load static %}#}
-            {#            <img src="{% static "MIK32Static.jpg" %}" alt="Static feed not available"#}
-            {#                 style="max-width: 800px;max-height: 450px;display: block; margin: 0 auto">#}
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 0fr; align-items: center">
-            {% for pin in pins_info.pins %}
-                {% if pin.mode == 'output' %}
-                    <label style="margin-right: 15px">{{ pin.name }}</label>
-                    <div class="output-state" port-index="{{ pin.index }}" value="{{ pin.state }}"></div>
-                {% endif %}
-            {% endfor %}
-        </div>
-    </div>
-    <div style="display: flex; justify-content: center; align-items: center;">
-        <textarea id="code-input" style="width: 33%; height: 200px;"></textarea>
-        <div>
-            <button style="width: fit-content; height: fit-content; padding: 5px 10px;" onclick="uploadProgram()">
-                Upload
-            </button>
-            <div id="upload-error-text"
-                 style="overflow: scroll; white-space: nowrap; max-width: 400px; max-height: 200px;">
+    <h1 style="margin-left: -10px; margin-right: -10px;
+               padding-left: 10px; padding-right: 10px;
+               background-color: #B4D5FE;">Удалённый стенд MIK32 “Амур”</h1>
+    <div style="margin: 0 50px; display: flex; justify-content: center;">
+        <div class="main-col">
+            <div id="monitor-state-container" class="disabled-gray"
+                 style="margin: 0 15px 15px 15px; display: flex; align-items: center;">
+                <label style="margin-right: 15px">Виртуальные входы/выходы:</label>
+                <!-- Rounded switch -->
+                <label class="switch">
+                    <input type="checkbox" id="monitor-state" onclick="setMonitorState(this.checked);" disabled>
+                    <span class="slider round"></span>
+                </label>
             </div>
+            <div id="pin-controls-container" class="disabled-gray"
+                 style="margin-bottom: auto;
+                        display: grid; grid-template-columns: 1fr 1fr; grid-gap: 30px 5px; align-items: center;">
+                <h3 class="pin-header" style="grid-row: 1; grid-column: 1 / span 2;">Входы</h3>
+                <h3 class="pin-header" style="grid-row: 1; grid-column: 3 / span 2;">Выходы</h3>
+                {% for pin in pins_info.input.pins %}
+                    {% if pin.mode == 'input' %}
+                        {#                    <div class="pin-container" style="grid-row: {{ forloop.counter|add:1 }}; grid-column: 1;">#}
+                        <label style="grid-row: {{ forloop.counter|add:1 }}; grid-column: 1;
+                                margin-right: 15px">{{ pin.name }}</label>
+                        <!-- Rounded switch -->
+                        <label class="switch" style="grid-row: {{ forloop.counter|add:1 }}; grid-column: 2;">
+                            <input type="checkbox" class="input-state" port-index="{{ pin.index }}" disabled
+                                   onclick="setInputState({{ pin.index }}, this.checked);">
+                            <span class="slider round"></span>
+                        </label>
+                        {#                    </div>#}
+                    {% endif %}
+                {% endfor %}
+                {% for pin in pins_info.output.pins %}
+                    {% if pin.mode == 'output' %}
+                        {#                    <div class="pin-container" style="grid-row: {{ forloop.counter|add:1 }}; grid-column: 2;">#}
+                        <label style="grid-row: {{ forloop.counter|add:1 }}; grid-column: 3; margin-right: 15px">{{ pin.name }}</label>
+                        <div class="output-state"
+                             style="grid-row: {{ forloop.counter|add:1 }}; grid-column: 4;"
+                             port-index="{{ pin.index }}" value="{{ pin.state }}" disabled></div>
+                        {#                    </div>#}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="main-col">
+            {% if not mock_camera %}
+                <img id="camera-feed" src="/session/camera_feed" alt="Camera feed error">
+                {#            <img id="camera-feed" src="" alt="Camera feed error" style="width:800px;height:450px;">#}
+            {% else %}
+                {% load static %}
+                <img id="camera-feed" src="{% static "MIK32StaticV2.jpg" %}" alt="Static feed not available">
+            {% endif %}
+            <div id="waveform-container" style="margin-top: 10px; width: 800px; height: 500px;"></div>
+        </div>
+        <div class="main-col" style="flex-grow: 1; display: flex; flex-direction: column;">
+            <h3 style="margin: 0 10px 10px 10px;">Загрузка программы</h3>
+            <textarea id="code-input" style="flex-grow: 1; min-width: 400px; resize: none"></textarea>
+            <div style="display: flex; align-items: center">
+                <button id="upload-button"
+                        style="margin: 10px; width: fit-content; height: fit-content; padding: 7px 40px;"
+                        onclick="uploadProgram()">
+                    Загрузить
+                </button>
+                <div id="upload-loader" class="loader-spinner" style="visibility: hidden"></div>
+                <label id="upload-result"></label>
+            </div>
+            <h3 style="margin: 10px;">Лог загрузки</h3>
+            <textarea id="upload-error-text" readonly="readonly"
+                      style="min-width: 400px; height: 200px; overflow: scroll; white-space: pre; resize: none;">
+            </textarea>
         </div>
     </div>
 {% endblock %}

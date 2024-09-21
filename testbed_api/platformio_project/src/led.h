@@ -2,18 +2,18 @@
 #include "mik32_hal_gpio.h"
 
 // Пины для вывода
-HAL_PinsTypeDef a  = GPIO_PIN_4;
-HAL_PinsTypeDef b  = GPIO_PIN_5;
-HAL_PinsTypeDef c  = GPIO_PIN_6;
-HAL_PinsTypeDef d  = GPIO_PIN_7;
-HAL_PinsTypeDef e  = GPIO_PIN_8;
-HAL_PinsTypeDef f  = GPIO_PIN_9;
+HAL_PinsTypeDef a  = GPIO_PIN_13;
+HAL_PinsTypeDef b  = GPIO_PIN_4;
+HAL_PinsTypeDef c  = GPIO_PIN_7;
+HAL_PinsTypeDef d  = GPIO_PIN_6;
+HAL_PinsTypeDef e  = GPIO_PIN_3;
+HAL_PinsTypeDef f  = GPIO_PIN_12;
 HAL_PinsTypeDef g  = GPIO_PIN_10;
-HAL_PinsTypeDef p  = GPIO_PIN_11;
-HAL_PinsTypeDef d1 = GPIO_PIN_12;
-HAL_PinsTypeDef d2 = GPIO_PIN_13;
-HAL_PinsTypeDef d3 = GPIO_PIN_14;
-HAL_PinsTypeDef d4 = GPIO_PIN_15;
+HAL_PinsTypeDef p  = GPIO_PIN_14;
+HAL_PinsTypeDef d1 = GPIO_PIN_5;
+HAL_PinsTypeDef d2 = GPIO_PIN_1;
+HAL_PinsTypeDef d3 = GPIO_PIN_0;
+HAL_PinsTypeDef d4 = GPIO_PIN_2;
 
 void delay() {
     for (volatile int i = 0; i < 8000; i++)
@@ -215,22 +215,22 @@ void pickNumber(int x) {
 void showNumber(int n)
 {
     clearLEDs();
-    pickDigit(0); //включаем первую цифру
-    pickNumber(n%10); //значение тысячи
+    pickDigit(3); //включаем первую цифру
+    pickNumber(n/1000%10); //значение тысячи
     delay(); //пауза 5мс
 
     clearLEDs();
-    pickDigit(1); //включаем вторую цифру
-    pickNumber(n%10); //значение сотни
+    pickDigit(2); //включаем вторую цифру
+    pickNumber(n/100%10); //значение сотни
     delay(); //пауза 5мс
 
     clearLEDs();
-    pickDigit(2); //включаем третью цифру
-    pickNumber(n%10); //значение десятки
+    pickDigit(1); //включаем третью цифру
+    pickNumber(n/10%10); //значение десятки
     delay(); //пауза 5мс
 
     clearLEDs();
-    pickDigit(3); //включаем четвертую цифру
+    pickDigit(0); //включаем четвертую цифру
     pickNumber(n%10); //значение единицы
     delay(); //пауза 5мс
 }

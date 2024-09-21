@@ -1,3 +1,29 @@
+.main-col {
+    margin: 0 10px;
+}
+
+#camera-feed {
+    display: block;
+    width: 800px;
+    height: 400px;
+    object-fit: contain;
+}
+
+.pin-header {
+    margin: 0 0 0 15px;
+}
+
+.pin-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.disabled-gray {
+    filter: contrast(25%);
+}
+
 .output-state {
     width: 25px;
     height: 25px;
@@ -77,4 +103,19 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+.loader-spinner {
+  border: 10px solid #f3f3f3; /* Light grey */
+  border-top: 10px solid #3498db; /* Blue */
+  border-right: 10px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

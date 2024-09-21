@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -25,8 +24,7 @@ SECRET_KEY = 'django-insecure-=g=fqnfey6-3pn3@1)&wj@5)ym3%9*b%&k9q%zbof()8-*ox%z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "10.255.65.185"]
-
+ALLOWED_HOSTS = ["localhost"]
 
 # Application definition
 
@@ -72,7 +70,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'server.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -82,7 +79,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -102,7 +98,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -113,7 +108,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -128,15 +122,67 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Logging
+LOG_DIR = BASE_DIR / 'logs'
+MAIN_LOG = LOG_DIR / 'main.log'
+ERROR_LOG = LOG_DIR / 'error.log'
+TESTBED_LOG = LOG_DIR / 'testbed.log'
+REDIS_LOG = LOG_DIR / 'redis.log'
 
-CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+LOG_FILES = [MAIN_LOG, ERROR_LOG, TESTBED_LOG]
 
-
-REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(asctime)s: %(name)s|%(module)s>%(funcName)s>%(lineno)d: %(levelname)s : %(message)s",
+            "datefmt": "%Y-%m-%dT%H:%M:%SZ"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": MAIN_LOG,
+            "mode": "a",
+            "formatter": "verbose",
+        },
+        "error": {
+            "class": "logging.FileHandler",
+            "filename": ERROR_LOG,
+            "mode": "a",
+            "formatter": "verbose",
+            "level": "WARNING",
+        },
+        "testbed": {
+            "class": "logging.FileHandler",
+            "filename": TESTBED_LOG,
+            "mode": "a",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console", "file", "error"],
+        "level": "DEBUG" if DEBUG else "INFO",
+    },
+    "loggers": {
+        "testbed": {
+            "handlers": ["console", "file", "error", "testbed"],
+            "propagate": False,
+            "level": "DEBUG" if DEBUG else "INFO",
+        },
+    },
 }
+
+
+TESTBED_CAMERA_INDEX = 1
+TESTBED_SERIAL_PORT = 'COM7'
+TESTBED_OUTPUT_ENABLED = False
+
+TESTBED_DEBUG = DEBUG and True
+TESTBED_MOCK_CAMERA = TESTBED_DEBUG and False
+TESTBED_MOCK_SIGNALS = TESTBED_DEBUG and False
