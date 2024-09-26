@@ -9,20 +9,17 @@
 #include "led.h"
 
 
-const int T_MIN = 544/2;
-const int T_MAX = 2400/2;
+const int T_MIN = 250;
+const int T_MAX = 1080;
 const int T_PER = 20000;
 
-Timer16_HandleTypeDef htimer16_1;s
+Timer16_HandleTypeDef htimer16_1;
 
-/*
- * Данный пример демонстрирует работу с GPIO и PAD_CONFIG.
- * В примере настраивается вывод, который подключенный к светодиоду, в режим GPIO.
- */
 
 void SystemClock_Config();
 void GPIO_Init();
 static void Timer16_1_Init();
+
 
 int main()
 {
@@ -61,9 +58,6 @@ int main()
         state = HAL_GPIO_ReadPin(GPIO_2, GPIO_PIN_2);
         t |= state << 4;
 
-        // ШИМ
-        int val = (1 - n % 4) * (T_MAX - T_MIN) / 1 + T_MIN;
-        HAL_Timer16_StartPWM(&htimer16_1, T_PER, val);
 
         // Переключение светодиодов сдвигом
         HAL_GPIO_WritePin(GPIO_1, GPIO_PIN_15, GPIO_PIN_LOW);
@@ -83,14 +77,23 @@ int main()
         // Ожидание тактов и вывод числа
         for (volatile int i = 0; i < 100; i++)
         {
-            // Вывод числа на дисплей
             if (t == 0)
             {
+                // ШИМ
+                int val = (n % 4) * (T_MAX - T_MIN) / 3 + T_MIN;
+                HAL_Timer16_StartPWM(&htimer16_1, T_PER, val);
+                // Вывод числа на дисплей
                 int s = n%10 + n%10*10 + n%10*100 + n%10*1000;
                 showNumber(s);
             }
             else
+            {
+                // ШИМ
+                int val = (t % 32) * (T_MAX - T_MIN) / 31 + T_MIN;
+                HAL_Timer16_StartPWM(&htimer16_1, T_PER, val);
+                // Вывод числа на дисплей
                 showNumber(t);
+            }
         }
         n++;
     }

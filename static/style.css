@@ -4,8 +4,8 @@
 
 #camera-feed {
     display: block;
-    width: 800px;
-    height: 400px;
+    width: 1200px;
+    height: 600px;
     object-fit: contain;
 }
 
